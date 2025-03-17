@@ -76,44 +76,6 @@ def list_contacts(db: Session = Depends(get_db)):
                 </body>
              </html>"""
 
-@app.get("/contacts/{contact_id}", response_model=ContactSchema)
-def get_contact(contact_id: int, db: Session = Depends(get_db)):
-    contact = db.query(Contact).filter(Contact.id == contact_id).first()
-    if contact is None:
-        raise HTTPException(status_code=404, detail="Contact not found")
-    return contact
-
-@app.put("/contacts/{contact_id}", response_model=ContactSchema)
-def update_contact(contact_id: int, updated_contact: ContactSchema, db: Session = Depends(get_db)):
-    contact = db.query(Contact).filter(Contact.id == contact_id).first()
-    if contact is None:
-        raise HTTPException(status_code=404, detail="Contact not found")
-    contact.name = updated_contact.name
-    contact.phone = updated_contact.phone
-    contact.email = updated_contact.email
-    db.commit()
-    db.refresh(contact)
-    return contact
-
-@app.patch("/contacts/{contact_id}")
-def partial_update_contact(contact_id: int, phone: str, db: Session = Depends(get_db)):
-    contact = db.query(Contact).filter(Contact.id == contact_id).first()
-    if contact is None:
-        raise HTTPException(status_code=404, detail="Contact not found")
-    contact.phone = phone
-    db.commit()
-    db.refresh(contact)
-    return contact
-
-@app.delete("/contacts/{contact_id}")
-def delete_contact(contact_id: int, db: Session = Depends(get_db)):
-    contact = db.query(Contact).filter(Contact.id == contact_id).first()
-    if contact is None:
-        raise HTTPException(status_code=404, detail="Contact not found")
-    db.delete(contact)
-    db.commit()
-    return {"message": "Contact deleted"}
-
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
